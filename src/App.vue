@@ -1,10 +1,18 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <MainNav />
+  <router-view />
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import MainNav from "@/components/MainNav.vue";
+
+export default defineComponent({
+  components: {
+    MainNav,
+  },
+});
+</script>
 
 <style>
 #app {
@@ -14,17 +22,28 @@
   text-align: center;
   color: #2c3e50;
 }
-
-nav {
-  padding: 30px;
+body {
+  background-image: url("./assets/image/background.png");
+}
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+/* Track */
+::-webkit-scrollbar-track {
+  background: #fef2f2;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #fee2e2;
+  border-radius: 100vh;
+  border: 3px solid #fef2f2;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #fecaca;
 }
 </style>
