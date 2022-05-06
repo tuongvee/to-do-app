@@ -21,10 +21,13 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  position: relative;
 }
 body {
   background-image: url("./assets/image/background.png");
+  height: 100%;
 }
+
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;

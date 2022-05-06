@@ -9,21 +9,25 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
+    meta: { title: "Dashboard - Todo List" },
   },
   {
     path: "/signin",
     name: "signin",
     component: SigninView,
+    meta: { title: "Sign In - Todo List" },
   },
   {
     path: "/signup",
     name: "signup",
     component: SignupView,
+    meta: { title: "Sign Up - Todo List" },
   },
   {
     path: "/user",
     name: "user",
     component: UserView,
+    meta: { title: "User - Todo List" },
   },
   // {
   //   path: "/about",
@@ -41,4 +45,14 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  document.title = `${to.meta.title}`;
+  const publicPages = ["/signin", "/signup"];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem("accessToken");
+  if (authRequired && !loggedIn) {
+    return next("/signin");
+  }
+  next();
+});
 export default router;

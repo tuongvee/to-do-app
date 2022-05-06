@@ -1,41 +1,37 @@
 <template>
-  <form
-    class="bg-white shadow-2xl rounded p-5 mx-5 md:mx-20 xl:mx-64 2xl:mx-96"
-    @submit.prevent="updateUser"
-  >
-    <p class="uppercase font-semibold text-2xl mb-6">user information</p>
+  <div class="bg-white shadow-2xl rounded p-5 mx-5 md:mx-20 xl:mx-64 2xl:mx-96">
+    <p class="uppercase font-semibold text-2xl mb-6">information</p>
+
     <div class="mb-4">
-      <label class="block text-grey-darker text-sm font-bold mb-2" for="email">
+      <label
+        class="block float-left text-grey-darker font-bold mb-2"
+        for="email"
+      >
         Email
       </label>
       <input
         class="shadow border rounded w-full py-2 px-3 text-grey-darker"
         id="email"
         type="text"
-        placeholder="Email"
         v-model="user.email"
         disabled
       />
     </div>
     <div class="mb-4">
-      <label
-        class="block text-grey-darker text-sm font-bold mb-2"
-        for="username"
-      >
+      <label class="float-left text-grey-darker font-bold mb-2" for="username">
         Username
       </label>
       <input
         class="shadow border rounded w-full py-2 px-3 text-grey-darker"
         id="username"
         type="text"
-        placeholder="Username"
-        v-model="user.userName"
-        disabled
+        placeholder="{{user.name}}"
+        v-model="user.name"
       />
     </div>
     <div class="mb-4">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
+        class="block float-left text-grey-darker font-bold mb-2"
         for="password"
       >
         Password
@@ -45,13 +41,13 @@
         id="password"
         type="password"
         placeholder="*******"
-        v-model="user.passWord"
+        v-model="newPass"
         required
       />
     </div>
     <div class="mb-6">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
+        class="block float-left text-grey-darker font-bold mb-2"
         for="confirmpassword"
       >
         Confirm Password
@@ -61,18 +57,19 @@
         id="confirmpassword"
         type="password"
         placeholder="*******"
-        v-model="user.confirmPassword"
+        v-model="confirmNewPass"
         required
       />
     </div>
     <div class="flex justify-center items-center">
       <input
         class="font-bold py-2 px-4 rounded bg-red-300 text-red-900 items-center mx-4"
-        type="submit"
+        type="button"
         value="Update"
+        @click.prevent="updateUser"
       />
     </div>
-  </form>
+  </div>
 
   <!-- Update successfully -->
   <div
@@ -127,35 +124,75 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { UserRequest } from "@/models/user.model";
+import UserService from "@/services/user.service";
 
 export default defineComponent({
   name: "UserInfor",
+  async created() {
+    await UserService.get()
+      .then((res) => {
+        if (res?.data) {
+          this.user = res.data;
+          console.log(this.user);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
   data() {
     return {
       error: false,
       errorResponse: "",
       alertUpdate: false,
-      user: {
-        email: "",
-        userName: "",
-        passWord: "",
-        confirmPassword: "",
-      },
+      newName: "",
+      newPass: "",
+      confirmNewPass: "",
+      user: {} as UserRequest,
     };
   },
   methods: {
-    updateUser() {
-      if (this.user.passWord !== this.user.confirmPassword) {
+    async updateUser() {
+      if (this.newPass !== this.confirmNewPass) {
         this.error = true;
         this.errorResponse = "Password is not similar";
         setTimeout(() => (this.error = false), 2500);
       } else {
-        this.alertUpdate = true;
-
-        setTimeout(() => (this.alertUpdate = false), 2500);
+        if (this.newPass === "") this.newPass = this.user.password;
+        const data = {
+          name: this.user.name,
+          email: this.user.email,
+          password: this.newPass,
+        };
+        // await axios
+        //   .put(
+        //     "http://localhost:8080/users/me/update",
+        //     {
+        //       name: this.user.name,
+        //       email: this.user.email,
+        //       password: this.newPass,
+        //     },
+        //     {
+        //       headers: {
+        //         Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        //       },
+        //     }
+        //   )
+        await UserService.update(data)
+          .then((res) => {
+            if (res?.data) {
+              console.log(res.data);
+              this.alertUpdate = true;
+              setTimeout(() => (this.alertUpdate = false), 2500);
+              this.newPass = "";
+              this.confirmNewPass = "";
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
-      this.user.passWord = "";
-      this.user.confirmPassword = "";
     },
   },
 });

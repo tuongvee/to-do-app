@@ -1,28 +1,28 @@
 <template>
   <form
     class="bg-white shadow-2xl rounded p-5 mx-5 md:mx-20 xl:mx-64 2xl:mx-96"
-    @submit.prevent="onClickSignIn"
+    @submit.prevent="signIn"
   >
     <p class="uppercase font-semibold text-2xl mb-6">Sign In</p>
     <div class="mb-4">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
-        for="username"
+        class="block float-left text-grey-darker font-bold mb-2"
+        for="email"
       >
-        Username
+        Email
       </label>
       <input
         class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-        id="username"
-        type="text"
-        placeholder="Username"
-        v-model="user.userName"
+        id="email"
+        type="email"
+        placeholder="Email"
+        v-model="user.email"
         required
       />
     </div>
     <div class="mb-6">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
+        class="block float-left text-grey-darker font-bold mb-2"
         for="password"
       >
         Password
@@ -32,21 +32,21 @@
         id="password"
         type="password"
         placeholder="Password"
-        v-model="user.passWord"
+        v-model="user.password"
         required
       />
     </div>
-    <div class="flex justify-center items-center">
-      <input
-        class="font-bold py-2 px-4 rounded bg-red-300 text-red-900 items-center mx-4"
-        type="submit"
-        value="Sign In"
-      />
+    <div class="flex justify-end items-center">
       <button class="font-bold py-2 px-4 rounded items-center">
         <router-link class="m-2 p-2" to="/signup">
           <span>Sign Up</span>
         </router-link>
       </button>
+      <input
+        class="font-bold py-2 px-4 rounded bg-red-300 text-red-900 items-center mx-4"
+        type="submit"
+        value="Sign In"
+      />
     </div>
   </form>
   <!-- Error Update -->
@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import axios from "axios";
+import AuthService from "@/services/auth.service";
 
 export default defineComponent({
   name: "SignIn",
@@ -86,29 +86,28 @@ export default defineComponent({
       error: false,
       errorResponse: "",
       user: {
-        userName: "",
-        passWord: "",
+        email: "",
+        password: "",
       },
     };
   },
   methods: {
-    async onClickSignIn() {
-      if (!this.user.userName) {
-        // User name is invalid
-        this.error = true;
-        this.errorResponse = "User name is invalid!!!";
-        setTimeout(() => (this.error = false), 2500);
-      } else if (this.user.passWord) {
-        this.error = true;
-        this.errorResponse = "Password is wrong!!!";
-        setTimeout(() => (this.error = false), 2500);
-      }
-      // else {
-      //   const res = await axios.post("signin", this.user);
-      //   console.log(res);
-      // }
-      this.user.userName = "";
-      this.user.passWord = "";
+    async signIn() {
+      const data = {
+        email: this.user.email,
+        password: this.user.password,
+      };
+      await AuthService.login(data)
+        .then((res) => {
+          if (res?.data) {
+            localStorage.setItem("accessToken", res.data.accessToken);
+            localStorage.setItem("refreshToken", res.data.refreshToken);
+            this.$router.push("/");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 });

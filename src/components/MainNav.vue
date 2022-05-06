@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="flex flex-wrap fixed top-0 left-0 right-0 z-50 bg-red-50 p-4 items-center justify-between w-full"
+    class="flex flex-wrap fixed top-0 left-0 right-0 z-40 bg-red-50 p-4 items-center justify-between w-full"
   >
     <router-link to="/">
       <a href="#" class="flex items-center font-bold text-slate-900">
@@ -23,7 +23,7 @@
       </a>
     </router-link>
 
-    <div class="group inline-block absolute right-5">
+    <div class="group inline-block absolute right-5" v-if="visible">
       <button
         class="bg-transparent rounded-full inline-flex items-center text-slate-900"
       >
@@ -43,36 +43,60 @@
       <ul
         class="absolute right-0 top-10 w-48 hidden z-50 text-gray-700 py-1 group-hover:block bg-white rounded border border-gray-300 m-1"
       >
-        <li
+        <!-- <li
           class="bg-white py-3 px-4 block whitespace-no-wrap text-left font-semibold my-1 border-b border-gray-300"
         >
           <span>User Name</span>
-        </li>
-        <li class="">
-          <router-link
-            class="bg-white hover:bg-gray-100 py-2 px-4 block whitespace-no-wrap"
-            to="/"
+        </li> -->
+        <li>
+          <button
+            class="bg-white hover:bg-gray-100 py-2 px-4 whitespace-no-wrap w-full"
+            @click.prevent="dashBoard"
           >
-            <span>Dashboard</span>
-          </router-link>
+            Dash Board
+          </button>
         </li>
-        <li class="">
-          <router-link
-            class="bg-white hover:bg-gray-100 py-2 px-4 block whitespace-no-wrap"
-            to="/user"
+        <li>
+          <button
+            class="bg-white hover:bg-gray-100 py-2 px-4 whitespace-no-wrap w-full"
+            @click.prevent="userInfo"
           >
-            <span>Settings</span>
-          </router-link>
+            Settings
+          </button>
         </li>
         <li class="my-1 border-t border-gray-300">
-          <router-link
-            class="bg-white hover:bg-gray-100 py-2 px-4 block whitespace-no-wrap"
-            to="/signin"
+          <button
+            class="bg-white hover:bg-gray-100 py-2 px-4 whitespace-no-wrap w-full"
+            @click.prevent="logOut"
           >
-            <span>Log Out</span>
-          </router-link>
+            Log Out
+          </button>
         </li>
       </ul>
     </div>
   </nav>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  data() {
+    return {
+      visible: true,
+    };
+  },
+  methods: {
+    dashBoard() {
+      this.$router.push("/");
+    },
+    userInfo() {
+      this.$router.push("/user");
+    },
+    logOut() {
+      localStorage.clear();
+      this.$router.push("/signin");
+    },
+  },
+});
+</script>

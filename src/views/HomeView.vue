@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-24 mb-5">
+  <div class="mt-24 z-10">
     <DashBoard />
   </div>
 </template>

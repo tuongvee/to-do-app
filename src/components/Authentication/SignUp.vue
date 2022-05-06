@@ -1,11 +1,14 @@
 <template>
   <form
     class="bg-white shadow-2xl rounded p-5 mx-5 md:mx-20 xl:mx-64 2xl:mx-96"
-    @submit.prevent="onClickSignUp"
+    @submit.prevent="SignUp"
   >
     <p class="uppercase font-semibold text-2xl mb-6">Sign up</p>
     <div class="mb-4">
-      <label class="block text-grey-darker text-sm font-bold mb-2" for="email">
+      <label
+        class="block float-left text-grey-darker font-bold mb-2"
+        for="email"
+      >
         Email
       </label>
       <input
@@ -19,23 +22,23 @@
     </div>
     <div class="mb-4">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
-        for="username"
+        class="block float-left text-grey-darker font-bold mb-2"
+        for="name"
       >
-        Username
+        Name
       </label>
       <input
         class="shadow border rounded w-full py-2 px-3 text-grey-darker"
-        id="username"
+        id="name"
         type="text"
-        placeholder="Username"
-        v-model="user.userName"
+        placeholder="Name"
+        v-model="user.name"
         required
       />
     </div>
     <div class="mb-4">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
+        class="block float-left text-grey-darker font-bold mb-2"
         for="password"
       >
         Password
@@ -51,7 +54,7 @@
     </div>
     <div class="mb-6">
       <label
-        class="block text-grey-darker text-sm font-bold mb-2"
+        class="block float-left text-grey-darker font-bold mb-2"
         for="password"
       >
         Confirm Password
@@ -65,17 +68,17 @@
         required
       />
     </div>
-    <div class="flex justify-center items-center">
-      <input
-        class="font-bold py-2 px-4 rounded bg-red-300 text-red-900 items-center"
-        type="submit"
-        value="Sing Up"
-      />
+    <div class="flex justify-end items-center">
       <button class="font-bold py-2 px-4 rounded items-center">
         <router-link class="m-2 p-2" to="/signin">
           <span>Sign In</span>
         </router-link>
       </button>
+      <input
+        class="font-bold py-2 px-4 rounded bg-red-300 text-red-900 items-center"
+        type="submit"
+        value="Sing Up"
+      />
     </div>
   </form>
   <!-- Error Update -->
@@ -106,7 +109,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import axios from "axios";
+import AuthService from "@/services/auth.service";
 
 export default defineComponent({
   name: "SignUp",
@@ -116,36 +119,34 @@ export default defineComponent({
       errorResponse: "",
       user: {
         email: "",
-        userName: "",
+        name: "",
         passWord: "",
         confirmPassword: "",
       },
     };
   },
   methods: {
-    async onClickSignUp() {
-      if (!this.user.email) {
-        // Email is already valid
-        this.error = true;
-        this.errorResponse = "Email is already valid!!!";
-        setTimeout(() => (this.error = false), 2500);
-      } else if (!this.user.userName) {
-        // User name is already valid
-        this.error = true;
-        this.errorResponse = "User name is already valid!!!";
-        setTimeout(() => (this.error = false), 2500);
-      } else if (this.user.passWord !== this.user.confirmPassword) {
-        this.error = true;
-        this.errorResponse = "Password is not similar!!!";
-        setTimeout(() => (this.error = false), 2500);
+    async SignUp() {
+      if (this.user.passWord === this.user.confirmPassword) {
+        const data = {
+          email: this.user.email,
+          password: this.user.passWord,
+          name: this.user.name,
+        };
+        await AuthService.register(data)
+          .then((res) => {
+            if (res?.data) {
+              this.$router.push("/signin");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       } else {
-        const res = await axios.post("signup", this.user);
-        console.log(res);
+        this.error = true;
+        this.errorResponse = "Please confirm similar password!!!";
+        setTimeout(() => (this.error = false), 1000);
       }
-      this.user.email = "";
-      this.user.userName = "";
-      this.user.passWord = "";
-      this.user.confirmPassword = "";
     },
   },
 });
